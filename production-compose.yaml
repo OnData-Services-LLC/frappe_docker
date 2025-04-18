@@ -54,16 +54,6 @@ services:
       - sites:/home/frappe/frappe-bench/sites
       - assets:/home/frappe/frappe-bench/sites/assets
 
-  web:
-    image: frappe/erpnext-nginx:edge
-    restart: unless-stopped
-    depends_on:
-      - backend
-    ports:
-      - "8090:8080"
-    volumes:
-      - sites:/home/frappe/frappe-bench/sites
-      - assets:/home/frappe/frappe-bench/sites/assets
 
 volumes:
   mariadb:
