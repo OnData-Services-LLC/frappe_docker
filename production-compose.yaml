@@ -1,0 +1,74 @@
+version: "3"
+
+services:
+  redis-cache:
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - redis-cache:/data
+
+  redis-queue:
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - redis-queue:/data
+
+  redis-socketio:
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - redis-socketio:/data
+
+  mariadb:
+    image: mariadb:10.6
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+    volumes:
+      - mariadb:/var/lib/mysql
+
+  site-creator:
+    image: frappe/erpnext-worker:v15.25.0
+    depends_on:
+      - mariadb
+      - redis-cache
+      - redis-queue
+      - redis-socketio
+    environment:
+      - SITES=erp.mysite.local
+      - DB_ROOT_USER=root
+      - DB_ROOT_PASSWORD=admin
+      - ADMIN_PASSWORD=admin123
+      - INSTALL_APPS=erpnext
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - assets:/home/frappe/frappe-bench/sites/assets
+    command: new
+
+  backend:
+    image: frappe/erpnext-worker:v15.25.0
+    restart: unless-stopped
+    depends_on:
+      - site-creator
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - assets:/home/frappe/frappe-bench/sites/assets
+
+  web:
+    image: frappe/erpnext-nginx:v15.25.0
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - assets:/home/frappe/frappe-bench/sites/assets
+
+volumes:
+  mariadb:
+  redis-cache:
+  redis-queue:
+  redis-socketio:
+  sites:
+  assets:
