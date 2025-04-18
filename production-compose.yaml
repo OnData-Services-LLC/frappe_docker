@@ -53,6 +53,14 @@ services:
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - assets:/home/frappe/frappe-bench/sites/assets
+      
+  web:
+    image: frappe/erpnext-nginx:edge
+    depends_on:
+      - backend
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - assets:/home/frappe/frappe-bench/sites/assets
 
 
 volumes:
