@@ -58,6 +58,8 @@ services:
     image: frappe/erpnext-nginx:edge
     depends_on:
       - backend
+    expose:
+      - "8090:8080"  # DO NOT use ports: "8080:8080"
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - assets:/home/frappe/frappe-bench/sites/assets
